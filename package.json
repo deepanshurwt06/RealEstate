@@ -3,10 +3,12 @@
   "version": "1.0.0",
   "description": "developing a Real Estate project using MERN stack and tailwind css",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "dev": "nodemon api/index.js",
     "start": "node api/index.js"
   },
+
   "keywords": [],
   "author": "",
   "license": "ISC",
