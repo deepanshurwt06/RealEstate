@@ -1,8 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import userRoutes from "./routes/user.route.js"; // Ensure file extension is included
-
+import userRoute from "./routes/user.route.js"; // Ensure file extension is included
+import authRoute from "./routes/auth.route.js"; // Ensure file extension is included
 dotenv.config();
 const app = express();
 
@@ -15,6 +15,11 @@ mongoose
     console.log(err);
   });
 
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
 });
@@ -24,4 +29,5 @@ app.get("/", (req, res) => {
 });
 
 // Use the imported user routes
-app.use("/api/user", userRoutes);
+app.use("/api/user", userRoute);
+app.use("/api/auth", authRoute);
