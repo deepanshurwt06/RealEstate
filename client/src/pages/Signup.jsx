@@ -15,36 +15,33 @@ export default function Signup() {
     });
   };
   const handleSubmit = async (e) => {
-   
     e.preventDefault();
 
-    try{
-        setLoading(true);
-        const res = await fetch("/api/auth/signup", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        });
-        const data = await res.json();
-    
-        if (data.success === false) {
-          setLoading(false);
-          setError(data.message);
-    
-          return;
-        }
-        setLoading(false);
-       
-        setError(null)
-       navigate('/sign-in')
-    }catch(error){
-        setLoading(false)
-        setError(error.message)
-    }
+    try {
+      setLoading(true);
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
 
-   
+      if (data.success === false) {
+        setLoading(false);
+        setError(data.message);
+
+        return;
+      }
+      setLoading(false);
+
+      setError(null);
+      navigate("/sign-in");
+    } catch (error) {
+      setLoading(false);
+      setError(error.message);
+    }
   };
   console.log(formData);
   return (
