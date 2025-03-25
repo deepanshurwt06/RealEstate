@@ -2,8 +2,8 @@ import {useSelector} from 'react-redux';
 import { useRef, useState ,useEffect} from 'react'
 import {getDownloadURL, getStorage, ref, uploadBytesResumable} from 'firebase/storage';
 import { app } from "../firebase";
-
-
+import { updateUserStart , updateUserFailure, updateUserSuccess } from '../redux/user/userSlice';
+import {useDispatch } from 'react-redux';
 
 
 export default function Profile() {
@@ -13,6 +13,7 @@ export default function Profile() {
     const [filePerc, setFilePerc] = useState(0)
     const [fileUploadErr, setFileUploadErr] = useState(false);
     const [formData, setFormData] = useState({});
+    const dispatch = useDispatch();
     
 
     //firebase storage rules 
@@ -50,12 +51,40 @@ export default function Profile() {
         },
     )
     }
+
+    const handleChange = (e) =>{
+        setFormData({ ...formData, [e.target.id]:e.target.value});
+    }
    
+    const handleSubmit = async (e)=>{
+      e.preventDefault();
+      try {
+        dispatch(updateUserStart());
+        const res = await fetch(`api/user/update/${currentUser._id}`,{
+            method: 'POST',
+            headers: {
+                'Content-Type' : 'application/json',
+            },
+            body : JSON.stringify(formData),
+
+        });
+        const data = await res.json();
+        if(data.success === false){
+            dispatch(updateUserFailure(data.message));
+            return ;
+        }
+        dispatch(updateUserSuccess(data));
+
+      } catch (error) {
+        dispatch(updateUserFailure(error.message));
+      }
+    }
+
     return (
         <div className='p-4 max-w-lg mx-auto'>
             <h1 className="text-3xl font-semibold text-center my-9">Profile</h1>
 
-            <form className='flex flex-col gap-5'>
+            <form onSubmit={handleSubmit} className='flex flex-col gap-5'>
                 <input onChange={(e) => setFile(e.target.files[0])}
                  type="file" ref={fileRef} hidden accept='image/*'/>
 
@@ -74,11 +103,11 @@ export default function Profile() {
                 </p>
 
 
-                <input className='border border-slate-300 p-3 rounded-lg bg-white' type="text" placeholder='Username' id='username' />
+                <input className='border border-slate-300 p-3 rounded-lg bg-white' type="text" placeholder='Username' id='username' defaultValue={currentUser.username} onChange={handleChange}/>
                 
-                <input className='border border-slate-300 p-3 rounded-lg bg-white' type="email" placeholder='Email'  id='email' />
+                <input className='border border-slate-300 p-3 rounded-lg bg-white' type="email" placeholder='Email'  id='email'  defaultValue={currentUser.email} onChange={handleChange}/>
                 
-                <input className='border border-slate-300 p-3 rounded-lg bg-white' type="text" placeholder='Password' id='password' />
+                <input className='border border-slate-300 p-3 rounded-lg bg-white' type="password" placeholder='Password' id='password' onChange={handleChange}/>
 
                 <button className='bg-slate-700 rounded-lg text-white uppercase p-3 font-semibold hover:opacity-95 disabled:opacity-80'>update</button>
             </form>
